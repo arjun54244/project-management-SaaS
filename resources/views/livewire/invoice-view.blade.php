@@ -52,9 +52,9 @@
                 @else
                     <span
                         class="px-3 py-1 text-sm rounded-full 
-                                                    @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                                    @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                                    @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
+                                                        @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                                        @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                                        @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
                         {{ ucfirst($invoice->payment_status->value) }}
                     </span>
                 @endif
@@ -77,6 +77,9 @@
                 <p class="text-zinc-600 dark:text-zinc-400">{{ $invoice->client->email }}</p>
                 @if($invoice->client->phone)
                     <p class="text-zinc-600 dark:text-zinc-400">{{ $invoice->client->phone }}</p>
+                @endif
+                @if($invoice->client->gst_number)
+                    <p class="text-zinc-600 dark:text-zinc-400">GSTIN: {{ $invoice->client->gst_number }}</p>
                 @endif
             </div>
             <div class="text-right">

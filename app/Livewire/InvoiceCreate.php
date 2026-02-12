@@ -11,6 +11,8 @@ use App\Services\InvoiceService;
 use App\Enums\SubscriptionStatus;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use App\Models\Domain;
+use App\Models\Hosting;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -21,11 +23,14 @@ class InvoiceCreate extends Component
     public $clients;
     public $availablePackages;
     public $availableServices;
+    public $availableDomains;
+    public $availableHostings;
 
     public $client_id = '';
     public $subscription_id = '';
     public $due_date;
     public $items = [];
+    public $subtotal = 0;
     public $tax = 0;
     public $discount = 0;
     public $total_amount = 0;
@@ -36,8 +41,8 @@ class InvoiceCreate extends Component
         'client_id' => 'required|exists:clients,id',
         'subscription_id' => 'nullable|exists:subscriptions,id',
         'due_date' => 'required|date',
-        'items.*.item_type' => 'required|in:package,service,custom',
-        'items.*.item_id' => 'nullable|required_if:items.*.item_type,package,service',
+        'items.*.item_type' => 'required|in:package,service,domain,hosting,custom',
+        'items.*.item_id' => 'nullable|required_if:items.*.item_type,package,service,domain,hosting',
         'items.*.description' => 'required|string|max:255',
         'items.*.qty' => 'required|integer|min:1',
         'items.*.price' => 'required|numeric|min:0',
@@ -57,9 +62,27 @@ class InvoiceCreate extends Component
 
         $this->availablePackages = Package::where('status', 'active')->orderBy('name')->get();
         $this->availableServices = Service::where('status', 'active')->orderBy('name')->get();
+        $this->availableDomains = Domain::where('status', 'active')->orderBy('name')->get();
+        $this->availableHostings = Hosting::where('status', 'active')->orderBy('plan_name')->get();
 
         $this->due_date = now()->addDays(7)->format('Y-m-d');
-        $this->addItem();
+
+        $this->client_id = request()->query('client_id');
+
+        if (request()->has('item_type')) {
+            $this->items = []; // Clear default item added by addItem
+            $this->items[] = [
+                'item_type' => request()->query('item_type', 'custom'),
+                'item_id' => request()->query('item_id'),
+                'description' => request()->query('description', ''),
+                'qty' => request()->query('qty', 1),
+                'price' => (float) request()->query('price', 0),
+                'total' => (float) request()->query('price', 0) * (int) request()->query('qty', 1),
+            ];
+            $this->calculateTotals();
+        } else {
+            $this->addItem();
+        }
     }
 
     public function addItem()
@@ -112,6 +135,18 @@ class InvoiceCreate extends Component
                 if ($service) {
                     $this->items[$index]['description'] = $service->name;
                     $this->items[$index]['price'] = $service->base_price;
+                }
+            } elseif ($type === 'domain' && $id) {
+                $domain = $this->availableDomains->find($id);
+                if ($domain) {
+                    $this->items[$index]['description'] = 'Domain Renewal: ' . $domain->name;
+                    $this->items[$index]['price'] = $domain->renewal_price;
+                }
+            } elseif ($type === 'hosting' && $id) {
+                $hosting = $this->availableHostings->find($id);
+                if ($hosting) {
+                    $this->items[$index]['description'] = 'Hosting Renewal: ' . $hosting->plan_name;
+                    $this->items[$index]['price'] = $hosting->renewal_price;
                 }
             }
         }

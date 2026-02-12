@@ -18,6 +18,10 @@ use App\Livewire\InvoiceEdit;
 use App\Livewire\InvoiceReceivePayment;
 use App\Livewire\InvoicePaymentHistory;
 use App\Livewire\PaymentList;
+use App\Livewire\DomainList;
+use App\Livewire\DomainForm;
+use App\Livewire\HostingList;
+use App\Livewire\HostingForm;
 
 Route::get('/', function () {
     return view('welcome');
@@ -54,6 +58,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('invoices.pdf');
 
     Route::get('payments', PaymentList::class)->name('payments.index');
+
+    Route::get('domains', DomainList::class)->name('domains.index');
+    Route::get('domains/create', DomainForm::class)->name('domains.create');
+    Route::get('domains/{domain}/edit', DomainForm::class)->name('domains.edit');
+
+    Route::get('hostings', HostingList::class)->name('hostings.index');
+    Route::get('hostings/create', HostingForm::class)->name('hostings.create');
+    Route::get('hostings/{hosting}/edit', HostingForm::class)->name('hostings.edit');
 });
 
 require __DIR__ . '/settings.php';

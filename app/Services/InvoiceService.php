@@ -22,8 +22,8 @@ class InvoiceService
             'due_date' => Carbon::now()->addDays(30),
             'subtotal' => $subscription->final_price,
             'discount' => 0,
-            'tax' => 0,
-            'total_amount' => $subscription->final_price,
+            'tax' => $subscription->client->gst_enabled ? round($subscription->final_price * 0.18, 2) : 0,
+            'total_amount' => $subscription->client->gst_enabled ? round($subscription->final_price * 1.18, 2) : $subscription->final_price,
             'payment_status' => PaymentStatus::Unpaid,
         ]);
 

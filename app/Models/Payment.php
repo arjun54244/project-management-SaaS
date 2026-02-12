@@ -34,6 +34,14 @@ class Payment extends Model
     {
         parent::boot();
 
+        static::created(function ($payment) {
+            $payment->invoice->recalculateStatus();
+        });
+
+        static::deleted(function ($payment) {
+            $payment->invoice->recalculateStatus();
+        });
+
         static::updating(function ($payment) {
             throw new \Exception('Payments are immutable and cannot be updated. Create a new payment or refund instead.');
         });

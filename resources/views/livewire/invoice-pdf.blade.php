@@ -221,6 +221,9 @@
             @if($invoice->client->phone)
                 <p>{{ $invoice->client->phone }}</p>
             @endif
+            @if($invoice->client->gst_number)
+                <p>GSTIN: {{ $invoice->client->gst_number }}</p>
+            @endif
         </div>
         <div class="info-block dates">
             <div>

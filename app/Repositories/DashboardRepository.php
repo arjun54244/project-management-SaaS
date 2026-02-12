@@ -6,7 +6,11 @@ use App\Models\Subscription;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Client;
+use App\Models\Domain;
+use App\Models\Hosting;
 use App\Enums\SubscriptionStatus;
+use App\Enums\DomainStatus;
+use App\Enums\HostingStatus;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -56,48 +60,80 @@ class DashboardRepository
 
     public function getUpcomingRenewals($filter = '7days')
     {
-        $query = Subscription::where('status', SubscriptionStatus::Active);
-
         $now = Carbon::now();
+        $startDate = Carbon::today();
+        $endDate = Carbon::today()->addDays(7);
 
         switch ($filter) {
             case 'this_week':
-                $query->whereBetween('end_date', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()]);
+                $startDate = $now->copy()->startOfWeek();
+                $endDate = $now->copy()->endOfWeek();
                 break;
             case 'this_month':
-                $query->whereBetween('end_date', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()]);
+                $startDate = $now->copy()->startOfMonth();
+                $endDate = $now->copy()->endOfMonth();
                 break;
             case 'next_month':
                 $nextMonth = $now->copy()->addMonth();
-                $query->whereBetween('end_date', [$nextMonth->copy()->startOfMonth(), $nextMonth->copy()->endOfMonth()]);
+                $startDate = $nextMonth->copy()->startOfMonth();
+                $endDate = $nextMonth->copy()->endOfMonth();
                 break;
             case '7days':
             default:
-                $query->whereBetween('end_date', [Carbon::today(), Carbon::today()->addDays(7)]);
+                $startDate = Carbon::today();
+                $endDate = Carbon::today()->addDays(7);
                 break;
         }
 
-        return $query->with(['client', 'package'])
+        $subscriptions = Subscription::with(['client', 'package'])
+            ->where('status', SubscriptionStatus::Active)
+            ->whereBetween('end_date', [$startDate, $endDate])
             ->get()
-            ->map(function ($subscription) {
-                $daysRemaining = Carbon::today()->diffInDays($subscription->end_date, false);
-
-                $highlightLevel = 'info';
-                if ($daysRemaining <= 3) {
-                    $highlightLevel = 'danger';
-                } elseif ($daysRemaining <= 7) {
-                    $highlightLevel = 'warning';
-                }
-
-                return [
-                    'id' => $subscription->id,
-                    'client_name' => $subscription->client->name,
-                    'package_name' => $subscription->package->name,
-                    'end_date' => $subscription->end_date,
-                    'days_remaining' => $daysRemaining,
-                    'highlight_level' => $highlightLevel,
-                ];
+            ->map(function ($sub) {
+                return $this->formatRenewalItem($sub, 'subscription', $sub->end_date, $sub->client->name, $sub->package->name);
             });
+
+        $domains = Domain::with(['client'])
+            ->where('status', DomainStatus::Active)
+            ->whereBetween('expiry_date', [$startDate, $endDate])
+            ->get()
+            ->map(function ($domain) {
+                return $this->formatRenewalItem($domain, 'domain', $domain->expiry_date, $domain->client->name, $domain->name);
+            });
+
+        $hostings = Hosting::with(['client'])
+            ->where('status', HostingStatus::Active)
+            ->whereBetween('expiry_date', [$startDate, $endDate])
+            ->get()
+            ->map(function ($hosting) {
+                return $this->formatRenewalItem($hosting, 'hosting', $hosting->expiry_date, $hosting->client->name, $hosting->plan_name . ' (' . $hosting->provider . ')');
+            });
+
+        return $subscriptions->concat($domains)->concat($hostings)
+            ->sortBy('end_date')
+            ->values();
+    }
+
+    private function formatRenewalItem($model, $type, $date, $clientName, $itemName)
+    {
+        $daysRemaining = Carbon::today()->diffInDays($date, false);
+
+        $highlightLevel = 'info';
+        if ($daysRemaining <= 3) {
+            $highlightLevel = 'danger';
+        } elseif ($daysRemaining <= 7) {
+            $highlightLevel = 'warning';
+        }
+
+        return [
+            'id' => $model->id,
+            'type' => $type,
+            'client_name' => $clientName,
+            'package_name' => $itemName,
+            'end_date' => $date,
+            'days_remaining' => $daysRemaining,
+            'highlight_level' => $highlightLevel,
+        ];
     }
 
     public function getRevenueMetrics(int $year, $month = null)
@@ -115,10 +151,26 @@ class DashboardRepository
         $totalReceived = (float) $paymentQuery->sum('amount');
         $totalOutstanding = max(0, $totalInvoiced - $totalReceived);
 
+        // Calculate Tax Collected portion of payments
+        $taxCollectedQuery = Payment::join('invoices', 'payments.invoice_id', '=', 'invoices.id')
+            ->whereYear('payments.paid_at', $year);
+
+        if ($month && $month !== '') {
+            $taxCollectedQuery->whereMonth('payments.paid_at', (int) $month);
+        }
+
+        $taxCollected = (float) $taxCollectedQuery
+            ->where('invoices.total_amount', '>', 0)
+            ->sum(DB::raw('payments.amount * (invoices.tax / invoices.total_amount)'));
+
+        $netRevenue = $totalReceived - $taxCollected;
+
         return [
             'total_invoiced' => $totalInvoiced,
             'total_received' => $totalReceived,
             'total_outstanding' => $totalOutstanding,
+            'tax_collected' => $taxCollected,
+            'net_revenue' => $netRevenue,
         ];
     }
 

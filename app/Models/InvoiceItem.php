@@ -27,6 +27,16 @@ class InvoiceItem extends Model
         return $this->belongsTo(Service::class, 'item_id');
     }
 
+    public function domain()
+    {
+        return $this->belongsTo(Domain::class, 'item_id');
+    }
+
+    public function hosting()
+    {
+        return $this->belongsTo(Hosting::class, 'item_id');
+    }
+
     protected $casts = [
         'qty' => 'integer',
         'price' => 'decimal:2',

@@ -12,12 +12,8 @@ class ClientForm extends Component
 {
     public ?Client $client = null;
 
-    public $name = '';
-    public $email = '';
-    public $phone = '';
-    public $company_name = '';
-    public $dob = '';
-    public $status = 'active';
+    public $gst_number = '';
+    public $gst_enabled = false;
 
     public function mount(?Client $client = null)
     {
@@ -27,6 +23,8 @@ class ClientForm extends Component
             $this->email = $client->email;
             $this->phone = $client->phone;
             $this->company_name = $client->company_name;
+            $this->gst_number = $client->gst_number;
+            $this->gst_enabled = $client->gst_enabled;
             $this->dob = $client->dob ? $client->dob->format('Y-m-d') : '';
             $this->status = $client->status;
         }
@@ -39,29 +37,28 @@ class ClientForm extends Component
             'email' => ['required', 'email', Rule::unique('clients')->ignore($this->client)],
             'phone' => 'nullable|string|max:20',
             'company_name' => 'nullable|string|max:255',
+            'gst_number' => 'nullable|string|max:20',
+            'gst_enabled' => 'boolean',
             'dob' => 'nullable|date',
             'status' => 'required|in:active,inactive',
         ]);
 
+        $data = [
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'company_name' => $this->company_name,
+            'gst_number' => $this->gst_number,
+            'gst_enabled' => $this->gst_enabled,
+            'dob' => $this->dob ?: null,
+            'status' => $this->status,
+        ];
+
         if ($this->client) {
-            $this->client->update([
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone' => $this->phone,
-                'company_name' => $this->company_name,
-                'dob' => $this->dob ?: null,
-                'status' => $this->status,
-            ]);
+            $this->client->update($data);
             $message = 'Client updated successfully.';
         } else {
-            Client::create([
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone' => $this->phone,
-                'company_name' => $this->company_name,
-                'dob' => $this->dob ?: null,
-                'status' => $this->status,
-            ]);
+            Client::create($data);
             $message = 'Client created successfully.';
         }
 

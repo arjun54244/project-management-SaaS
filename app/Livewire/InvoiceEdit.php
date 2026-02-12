@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Models\Invoice;
 use App\Models\Package;
 use App\Models\Service;
+use App\Models\Domain;
+use App\Models\Hosting;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Carbon\Carbon;
@@ -26,10 +28,12 @@ class InvoiceEdit extends Component
 
     public $availablePackages;
     public $availableServices;
+    public $availableDomains;
+    public $availableHostings;
 
     protected $rules = [
-        'items.*.item_type' => 'required|in:package,service,custom',
-        'items.*.item_id' => 'nullable|required_if:items.*.item_type,package,service',
+        'items.*.item_type' => 'required|in:package,service,domain,hosting,custom',
+        'items.*.item_id' => 'nullable|required_if:items.*.item_type,package,service,domain,hosting',
         'items.*.description' => 'required|string|max:255',
         'items.*.qty' => 'required|integer|min:1',
         'items.*.price' => 'required|numeric|min:0',
@@ -51,6 +55,8 @@ class InvoiceEdit extends Component
 
         $this->availablePackages = Package::where('status', 'active')->orderBy('name')->get();
         $this->availableServices = Service::where('status', 'active')->orderBy('name')->get();
+        $this->availableDomains = Domain::where('status', 'active')->orderBy('name')->get();
+        $this->availableHostings = Hosting::where('status', 'active')->orderBy('plan_name')->get();
 
         $this->tax = (float) $invoice->tax;
         $this->discount = (float) $invoice->discount;
@@ -132,6 +138,18 @@ class InvoiceEdit extends Component
                 if ($service) {
                     $this->items[$index]['description'] = $service->name;
                     $this->items[$index]['price'] = $service->base_price;
+                }
+            } elseif ($type === 'domain' && $id) {
+                $domain = $this->availableDomains->find($id);
+                if ($domain) {
+                    $this->items[$index]['description'] = 'Domain Renewal: ' . $domain->name;
+                    $this->items[$index]['price'] = $domain->renewal_price;
+                }
+            } elseif ($type === 'hosting' && $id) {
+                $hosting = $this->availableHostings->find($id);
+                if ($hosting) {
+                    $this->items[$index]['description'] = 'Hosting Renewal: ' . $hosting->plan_name;
+                    $this->items[$index]['price'] = $hosting->renewal_price;
                 }
             }
         }

@@ -61,18 +61,7 @@ class PaymentService
      */
     public function updateInvoiceStatus(Invoice $invoice): void
     {
-        $totalPaid = $this->getTotalPaid($invoice);
-        $totalAmount = (float) $invoice->total_amount;
-
-        $status = $this->calculateInvoiceStatus($totalPaid, $totalAmount);
-
-        // Get the latest payment method to show on the invoice
-        $latestPaymentMethod = $invoice->payments()->latest('paid_at')->first()?->payment_method;
-
-        $invoice->update([
-            'payment_status' => $status,
-            'payment_method' => $latestPaymentMethod,
-        ]);
+        $status = $invoice->recalculateStatus();
 
         // Activate subscription if fully paid or partial activation is allowed
         if ($invoice->subscription && $invoice->subscription->status === \App\Enums\SubscriptionStatus::Pending) {
@@ -80,8 +69,25 @@ class PaymentService
 
             if ($status === PaymentStatus::Paid || ($allowPartial && $status === PaymentStatus::Partial)) {
                 $invoice->subscription->update(['status' => \App\Enums\SubscriptionStatus::Active]);
+            }
+        }
 
-                // Trigger an event or log activation if needed
+        // Handle Domain Renewal
+        if ($status === PaymentStatus::Paid) {
+            foreach ($invoice->items as $item) {
+                if ($item->item_type === 'domain') {
+                    $domain = \App\Models\Domain::find($item->item_id);
+                    if ($domain) {
+                        // Extend expiry by 1 year from current expiry or now if already expired?
+                        // Usually renewal adds 1 year to existing expiry.
+                        $newExpiry = $domain->expiry_date->isPast() ? Carbon::now()->addYear() : $domain->expiry_date->addYear();
+
+                        $domain->update([
+                            'expiry_date' => $newExpiry,
+                            'status' => \App\Enums\DomainStatus::Active,
+                        ]);
+                    }
+                }
             }
         }
     }
@@ -91,6 +97,9 @@ class PaymentService
      */
     public function calculateInvoiceStatus(float $totalPaid, float $totalAmount): PaymentStatus
     {
+        // This logic is now likely redundant if we rely on Invoice::recalculateStatus, 
+        // but kept for any external usage or removed if unused.
+        // For now, I'll keep it simple or remove it.
         if ($totalPaid <= 0) {
             return PaymentStatus::Unpaid;
         }

@@ -8,8 +8,8 @@
     </div>
 
     <!-- Search & Filters -->
-    <div class="mb-6">
-        <div class="relative max-w-sm">
+    <div class="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div class="relative max-w-sm w-full">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -21,7 +21,47 @@
                 class="block w-full p-2.5 pl-10 text-sm text-zinc-900 border border-zinc-300 rounded-lg bg-zinc-50 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:border-zinc-700 dark:placeholder-zinc-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
                 placeholder="Search clients...">
         </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Import Form -->
+            <div class="flex items-center gap-2">
+                <input type="file" wire:model="importFile" id="importFile" class="hidden" accept=".xlsx,.xls,.csv"
+                    wire:loading.attr="disabled">
+                <label for="importFile"
+                    class="cursor-pointer px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Select File
+                </label>
+                @if($importFile)
+                    <button wire:click="import" wire:loading.attr="disabled"
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
+                        Import
+                    </button>
+                    <span wire:loading wire:target="importFile" class="text-xs text-zinc-500">Uploading...</span>
+                    <span wire:loading wire:target="import" class="text-xs text-zinc-500">Processing...</span>
+                @endif
+            </div>
+
+            <button wire:click="export" wire:loading.attr="disabled"
+                class="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export
+            </button>
+        </div>
     </div>
+
+    @error('importFile') <div class="mb-4 text-sm text-red-600 dark:text-red-400">{{ $message }}</div> @enderror
+    @if (session()->has('error'))
+        <div class="mb-4 p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-red-900/30 dark:text-red-400">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <!-- Flash Message -->
     @if (session()->has('message'))

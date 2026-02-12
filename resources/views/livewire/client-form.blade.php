@@ -32,6 +32,22 @@
                 @error('company_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
 
+            <!-- GST Settings -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <flux:checkbox wire:model="gst_enabled" label="Enable GST for this client?" />
+                </div>
+
+                <div>
+                    <label for="gst_number" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">GST
+                        Number</label>
+                    <input wire:model="gst_number" type="text" id="gst_number"
+                        class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+                        placeholder="e.g. 29ABCDE1234F1Z5">
+                    @error('gst_number') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Phone -->
                 <div>

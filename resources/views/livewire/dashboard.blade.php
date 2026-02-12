@@ -96,6 +96,16 @@
         </div>
 
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <h3 class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Net Revenue</h3>
+            <p class="mt-2 text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                ₹{{ number_format($revenueMetrics['net_revenue'], 2) }}
+            </p>
+            <div class="mt-2 text-xs text-zinc-500">
+                + ₹{{ number_format($revenueMetrics['tax_collected'], 2) }} GST
+            </div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
             <h3 class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Received</h3>
             <p class="mt-2 text-3xl font-bold text-emerald-600 dark:text-emerald-500">
                 ₹{{ number_format($revenueMetrics['total_received'], 2) }}
@@ -301,10 +311,15 @@
                                 {{ $sub['client_name'] }}
                             </td>
                             <td class="px-6 py-4">
-                                <span
-                                    class="px-2 py-0.5 rounded text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold uppercase">
-                                    {{ $sub['package_name'] }}
-                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="px-2 py-0.5 rounded text-[10px] {{ $sub['type'] === 'subscription' ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : ($sub['type'] === 'domain' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400') }} font-bold uppercase">
+                                        {{ $sub['type'] }}
+                                    </span>
+                                    <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+                                        {{ $sub['package_name'] }}
+                                    </span>
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-zinc-600 dark:text-zinc-300">
                                 {{ $sub['end_date']->format('M d, Y') }}
@@ -322,8 +337,14 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <a href="{{ route('subscriptions.edit', $sub['id']) }}"
-                                    class="text-zinc-400 hover:text-indigo-600 transition">
+                                @php
+                                    $route = match ($sub['type']) {
+                                        'domain' => route('domains.edit', $sub['id']),
+                                        'hosting' => route('hostings.edit', $sub['id']),
+                                        default => route('subscriptions.edit', $sub['id']),
+                                    };
+                                @endphp
+                                <a href="{{ $route }}" class="text-zinc-400 hover:text-indigo-600 transition">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

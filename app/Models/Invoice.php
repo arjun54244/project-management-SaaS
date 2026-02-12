@@ -52,23 +52,47 @@ class Invoice extends Model
         return $this->hasMany(Payment::class);
     }
 
-    public function getTotalPaidAttribute()
+    public function getPaidAmountAttribute()
     {
         return $this->payments()->sum('amount');
     }
 
-    public function getRemainingBalanceAttribute()
+    public function getBalanceAttribute()
     {
-        return max(0, $this->total_amount - $this->total_paid);
+        return max(0, $this->total_amount - $this->paid_amount);
+    }
+
+    public function recalculateStatus()
+    {
+        $totalPaid = $this->payments()->sum('amount');
+        $totalAmount = (float) $this->total_amount;
+
+        if ($totalPaid >= $totalAmount) {
+            $this->payment_status = PaymentStatus::Paid;
+        } elseif ($totalPaid > 0) {
+            $this->payment_status = PaymentStatus::Partial;
+        } else {
+            $this->payment_status = PaymentStatus::Unpaid;
+        }
+
+        // Update the payment method to the latest one used
+        $latestPayment = $this->payments()->latest('paid_at')->first();
+        if ($latestPayment) {
+            $this->payment_method = $latestPayment->payment_method;
+        }
+
+        $this->save();
+
+        return $this->payment_status;
     }
 
     public function isFullyPaid(): bool
     {
-        return $this->total_paid >= $this->total_amount;
+        return $this->paid_amount >= $this->total_amount;
     }
 
     public function isPartiallyPaid(): bool
     {
-        return $this->total_paid > 0 && $this->total_paid < $this->total_amount;
+        return $this->paid_amount > 0 && $this->paid_amount < $this->total_amount;
     }
 }

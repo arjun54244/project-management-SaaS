@@ -4,7 +4,10 @@ namespace App\Livewire;
 
 use App\Models\Invoice;
 use App\Services\InvoiceService;
+use App\Services\PaymentService;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentMethod;
+use Carbon\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -16,10 +19,23 @@ class InvoiceList extends Component
 
     public $search = '';
     public $filterStatus = '';
-    public $showPaymentModal = false;
-    public $selectedInvoiceId;
+    public $paymentAmount;
+    public $paymentMethod;
+    public $transactionReference;
+    public $paymentNotes;
+    public $paymentDate;
 
     protected $listeners = ['payment-recorded' => 'handlePaymentRecorded'];
+
+    public function rules()
+    {
+        return [
+            'paymentAmount' => 'required|numeric|min:0.01',
+            'paymentMethod' => 'required',
+            'transactionReference' => 'nullable|string',
+            'paymentNotes' => 'nullable|string',
+        ];
+    }
 
     public function updatingSearch()
     {
@@ -34,6 +50,10 @@ class InvoiceList extends Component
     public function openPaymentModal($invoiceId)
     {
         $this->selectedInvoiceId = $invoiceId;
+        $invoice = Invoice::findOrFail($invoiceId);
+        $this->paymentAmount = $invoice->balance; // Default to remaining balance
+        $this->paymentMethod = PaymentMethod::Cash->value;
+        $this->paymentDate = now()->format('Y-m-d');
         $this->showPaymentModal = true;
     }
 
@@ -41,6 +61,7 @@ class InvoiceList extends Component
     {
         $this->showPaymentModal = false;
         $this->selectedInvoiceId = null;
+        $this->reset(['paymentAmount', 'paymentMethod', 'transactionReference', 'paymentNotes', 'paymentDate']);
     }
 
     public function handlePaymentRecorded()
@@ -48,13 +69,35 @@ class InvoiceList extends Component
         $this->closePaymentModal();
     }
 
-    public function markAsPaid($invoiceId)
+    public function savePayment()
     {
-        $invoice = Invoice::findOrFail($invoiceId);
-        app(InvoiceService::class)->markAsPaid($invoice);
-        session()->flash('message', 'Invoice #' . $invoice->invoice_number . ' marked as paid.');
-        $this->dispatch('payment-recorded');
-        $this->dispatch('dashboard-updated');
+        $this->validate();
+
+        try {
+            $invoice = Invoice::findOrFail($this->selectedInvoiceId);
+
+            // Re-check balance
+            if ($this->paymentAmount > $invoice->balance) {
+                $this->addError('paymentAmount', 'Amount cannot exceed remaining balance (' . $invoice->balance . ')');
+                return;
+            }
+
+            app(PaymentService::class)->recordPayment(
+                $invoice,
+                $this->paymentAmount,
+                PaymentMethod::from($this->paymentMethod),
+                $this->transactionReference,
+                $this->paymentNotes,
+                $this->paymentDate ? Carbon::parse($this->paymentDate) : now()
+            );
+
+            session()->flash('message', 'Payment recorded successfully.');
+            $this->dispatch('payment-recorded'); // You might want to refresh the list or dashboard
+            $this->closePaymentModal();
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to record payment: ' . $e->getMessage());
+        }
     }
 
     public function render()

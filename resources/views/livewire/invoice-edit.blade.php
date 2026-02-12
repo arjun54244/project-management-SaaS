@@ -55,6 +55,8 @@
                                             class="w-full bg-transparent border-zinc-200 dark:border-zinc-700 rounded-md focus:ring-indigo-500 dark:bg-zinc-800">
                                         <option value="package">Package</option>
                                         <option value="service">Service</option>
+                                        <option value="domain">Domain</option>
+                                        <option value="hosting">Hosting</option>
                                         <option value="custom">Custom</option>
                                     </select>
                                 </td>
@@ -75,6 +77,24 @@
                                             <option value="">Select Service...</option>
                                             @foreach($availableServices as $service)
                                                 <option value="{{ $service->id }}">{{ $service->name }} (₹{{ number_format($service->base_price, 2) }})</option>
+                                            @endforeach
+                                        </select>
+                                    @elseif($item['item_type'] === 'domain')
+                                        <select wire:model.live="items.{{ $index }}.item_id"
+                                                @if(!$canEdit) disabled @endif
+                                                class="w-full bg-transparent border-zinc-200 dark:border-zinc-700 rounded-md focus:ring-indigo-500 dark:bg-zinc-800">
+                                            <option value="">Select Domain...</option>
+                                            @foreach($availableDomains as $domain)
+                                                <option value="{{ $domain->id }}">{{ $domain->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    @elseif($item['item_type'] === 'hosting')
+                                        <select wire:model.live="items.{{ $index }}.item_id"
+                                                @if(!$canEdit) disabled @endif
+                                                class="w-full bg-transparent border-zinc-200 dark:border-zinc-700 rounded-md focus:ring-indigo-500 dark:bg-zinc-800">
+                                            <option value="">Select Hosting...</option>
+                                            @foreach($availableHostings as $hosting)
+                                                <option value="{{ $hosting->id }}">{{ $hosting->plan_name }} ({{ $hosting->provider }})</option>
                                             @endforeach
                                         </select>
                                     @endif

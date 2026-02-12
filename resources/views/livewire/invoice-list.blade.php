@@ -79,9 +79,9 @@
                                 @else
                                     <span
                                         class="px-2 py-1 text-xs rounded-full 
-                                                                                                        @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                                                                                        @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                                                                                        @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
+                                                                                                                @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                                                                                                @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                                                                                                @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
                                         {{ ucfirst($invoice->payment_status->value) }}
                                     </span>
                                 @endif
@@ -156,7 +156,74 @@
                 <div
                     class="inline-block align-bottom bg-white dark:bg-zinc-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        @livewire('invoice-receive-payment', ['invoice' => $selectedInvoiceId], key: 'payment-modal-' . $selectedInvoiceId)
+                        <h3 class="text-lg leading-6 font-medium text-zinc-900 dark:text-zinc-100" id="modal-title">
+                            Record Payment
+                        </h3>
+                        <div class="mt-4 space-y-4">
+                            <div>
+                                <label for="amount"
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Amount</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-zinc-500 sm:text-sm">₹</span>
+                                    </div>
+                                    <input type="number" step="0.01" wire:model="paymentAmount" id="amount"
+                                        class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-zinc-300 rounded-md dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+                                        placeholder="0.00">
+                                </div>
+                                @error('paymentAmount') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="method"
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Payment
+                                    Method</label>
+                                <select wire:model="paymentMethod" id="method"
+                                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-zinc-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
+                                    @foreach(\App\Enums\PaymentMethod::cases() as $method)
+                                        <option value="{{ $method->value }}">{{ $method->label() }}</option>
+                                    @endforeach
+                                </select>
+                                @error('paymentMethod') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="reference"
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Transaction
+                                    Reference</label>
+                                <input type="text" wire:model="transactionReference" id="reference"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-zinc-300 rounded-md dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+                                    placeholder="Check No, UPI Ref, etc.">
+                                @error('transactionReference') <span class="text-red-500 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="date" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Payment
+                                    Date</label>
+                                <input type="date" wire:model="paymentDate" id="date"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-zinc-300 rounded-md dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
+                                @error('paymentDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="notes"
+                                    class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Notes</label>
+                                <textarea wire:model="paymentNotes" id="notes" rows="3"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-zinc-300 rounded-md dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"></textarea>
+                                @error('paymentNotes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" wire:click="savePayment"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Record Payment
+                        </button>
+                        <button type="button" wire:click="closePaymentModal"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-zinc-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-600 dark:hover:bg-zinc-700">
+                            Cancel
+                        </button>
                     </div>
                 </div>
             </div>

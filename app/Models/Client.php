@@ -14,17 +14,31 @@ class Client extends Model
         'email',
         'phone',
         'company_name',
+        'gst_number',
+        'gst_enabled',
+        'address',
         'dob',
         'status',
     ];
 
     protected $casts = [
         'dob' => 'date',
+        'gst_enabled' => 'boolean',
     ];
 
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function domains()
+    {
+        return $this->hasMany(Domain::class);
+    }
+
+    public function hostings()
+    {
+        return $this->hasMany(Hosting::class);
     }
 
     public function invoices()

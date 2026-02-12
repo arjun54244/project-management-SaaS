@@ -50,6 +50,17 @@
                     {{ __('Payments') }}
                 </flux:sidebar.item>
             </flux:sidebar.group>
+
+            <flux:sidebar.group :heading="__('Asset Renewals')" class="grid">
+                <flux:sidebar.item icon="globe-alt" :href="route('domains.index')"
+                    :current="request()->routeIs('domains.*')" wire:navigate>
+                    {{ __('Domains') }}
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="server" :href="route('hostings.index')"
+                    :current="request()->routeIs('hostings.*')" wire:navigate>
+                    {{ __('Hosting') }}
+                </flux:sidebar.item>
+            </flux:sidebar.group>
         </flux:sidebar.nav>
 
         <flux:spacer />
