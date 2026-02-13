@@ -1,8 +1,11 @@
 <?php
-
 namespace App\Exports;
 
 use App\Models\Client;
+use App\Models\Payment;
+use App\Enums\SubscriptionStatus;
+use App\Enums\DomainStatus;
+use App\Enums\HostingStatus;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,7 +14,12 @@ class ClientsExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return Client::withCount(['invoices'])->with(['subscriptions', 'domains', 'hostings', 'invoices'])->get();
+        return Client::with([
+            'subscriptions',
+            'domains',
+            'hostings',
+            'invoices.payments'
+        ])->get();
     }
 
     public function headings(): array
@@ -35,6 +43,10 @@ class ClientsExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($client): array
     {
+        $totalPaid = $client->invoices->sum(function ($invoice) {
+            return $invoice->payments->sum('amount');
+        });
+
         return [
             $client->id,
             $client->name,
@@ -44,11 +56,11 @@ class ClientsExport implements FromCollection, WithHeadings, WithMapping
             $client->gst_enabled ? 'Yes' : 'No',
             $client->gst_number,
             $client->address,
-            $client->invoices_count,
-            $client->invoices->sum('paid_amount'),
-            $client->subscriptions->where('status', \App\Enums\SubscriptionStatus::Active)->count(),
-            $client->domains->where('status', \App\Enums\DomainStatus::Active)->count(),
-            $client->hostings->where('status', \App\Enums\HostingStatus::Active)->count(),
+            $client->invoices->count(),
+            $totalPaid,
+            $client->subscriptions->where('status', SubscriptionStatus::Active)->count(),
+            $client->domains->where('status', DomainStatus::Active)->count(),
+            $client->hostings->where('status', HostingStatus::Active)->count(),
         ];
     }
 }

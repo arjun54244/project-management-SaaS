@@ -213,7 +213,7 @@
 
             <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 text-xs text-zinc-500 dark:text-zinc-400 space-y-2">
                 <p>• Client: <span class="font-medium">{{ $invoice->client->name }}</span></p>
-                <p>• Subscription: <span class="font-medium">{{ $invoice->subscription->package->name }}</span></p>
+                <p>• Subscription: <span class="font-medium">{{ $invoice->subscription?->package?->name ?? 'N/A' }}</span></p>
                 <p>• Locked Fields: Invoice #, Client, Subscription</p>
             </div>
         </div>

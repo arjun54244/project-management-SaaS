@@ -24,6 +24,8 @@ class InvoiceList extends Component
     public $transactionReference;
     public $paymentNotes;
     public $paymentDate;
+    public $showPaymentModal = false;
+    public $selectedInvoiceId;
 
     protected $listeners = ['payment-recorded' => 'handlePaymentRecorded'];
 

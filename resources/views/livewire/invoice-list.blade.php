@@ -1,4 +1,22 @@
-<div>
+<div x-data="{
+    search: @entangle('search'),
+    filterStatus: @entangle('filterStatus'),
+    columns: JSON.parse(localStorage.getItem('invoice_table_columns')) || {
+        invoice_number: true,
+        client: true,
+        date: true,
+        due_date: true,
+        status: true,
+        payment_mode: true,
+        total: true,
+        paid: true,
+        balance: true
+    },
+    toggleColumn(col) {
+        this.columns[col] = !this.columns[col];
+        localStorage.setItem('invoice_table_columns', JSON.stringify(this.columns));
+    }
+}">
     <div class="mb-6 flex justify-between items-center">
         <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Invoices</h2>
         <a href="{{ route('invoices.create') }}"
@@ -14,6 +32,7 @@
     @endif
 
     <!-- Filters -->
+    <!-- Column Visibility & Filters -->
     <div class="mb-6 flex gap-4">
         <div class="relative max-w-sm flex-1">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -35,6 +54,37 @@
             <option value="partial">Partial</option>
             <option value="overdue">Overdue</option>
         </select>
+
+        <!-- Column Toggle Dropdown -->
+        <div x-data="{ open: false }" class="relative">
+            <button @click="open = !open" type="button"
+                class="px-4 py-2.5 text-sm font-medium text-zinc-900 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-100 focus:ring-4 focus:outline-none focus:ring-zinc-200 dark:bg-zinc-800 dark:text-white dark:border-zinc-600 dark:hover:bg-zinc-700 dark:hover:border-zinc-600 dark:focus:ring-zinc-700">
+                Columns
+                <svg class="w-2.5 h-2.5 ml-2.5 inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 4 4 4-4" />
+                </svg>
+            </button>
+            <div x-show="open" @click.away="open = false"
+                class="absolute z-10 w-48 bg-white rounded-lg shadow-sm border border-zinc-200 dark:bg-zinc-700 dark:border-zinc-600 mt-2 right-0">
+                <ul class="p-3 space-y-1 text-sm text-zinc-700 dark:text-zinc-200">
+                    <template x-for="(isEnabled, column) in columns" :key="column">
+                        <li>
+                            <div class="flex items-center p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-600">
+                                <input @click="toggleColumn(column)" :id="'checkbox-item-' + column" type="checkbox"
+                                    :checked="isEnabled"
+                                    class="w-4 h-4 text-indigo-600 bg-zinc-100 border-zinc-300 rounded-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-zinc-700 dark:focus:ring-offset-zinc-700 focus:ring-2 dark:bg-zinc-600 dark:border-zinc-500">
+                                <label :for="'checkbox-item-' + column"
+                                    class="w-full ml-2 text-sm font-medium text-zinc-900 rounded-sm dark:text-zinc-300 capitalize"
+                                    x-text="column.replace(/_/g, ' ')">
+                                </label>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <!-- Table -->
@@ -44,15 +94,15 @@
             <table class="w-full text-sm text-left">
                 <thead class="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-xs">
                     <tr>
-                        <th class="px-6 py-3">Invoice #</th>
-                        <th class="px-6 py-3">Client</th>
-                        <th class="px-6 py-3">Date</th>
-                        <th class="px-6 py-3">Due Date</th>
-                        <th class="px-6 py-3">Status</th>
-                        <th class="px-6 py-3">Payment Mode</th>
-                        <th class="px-6 py-3">Total</th>
-                        <th class="px-6 py-3">Paid</th>
-                        <th class="px-6 py-3">Balance</th>
+                        <th x-show="columns.invoice_number" class="px-6 py-3">Invoice #</th>
+                        <th x-show="columns.client" class="px-6 py-3">Client</th>
+                        <th x-show="columns.date" class="px-6 py-3">Date</th>
+                        <th x-show="columns.due_date" class="px-6 py-3">Due Date</th>
+                        <th x-show="columns.status" class="px-6 py-3">Status</th>
+                        <th x-show="columns.payment_mode" class="px-6 py-3">Payment Mode</th>
+                        <th x-show="columns.total" class="px-6 py-3">Total</th>
+                        <th x-show="columns.paid" class="px-6 py-3">Paid</th>
+                        <th x-show="columns.balance" class="px-6 py-3">Balance</th>
                         <th class="px-6 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -62,15 +112,17 @@
                             $isOverdue = $invoice->payment_status !== \App\Enums\PaymentStatus::Paid && $invoice->due_date->isPast();
                         @endphp
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
-                            <td class="px-6 py-4 font-medium text-zinc-900 dark:text-zinc-100">
+                            <td x-show="columns.invoice_number"
+                                class="px-6 py-4 font-medium text-zinc-900 dark:text-zinc-100">
                                 {{ $invoice->invoice_number }}
                             </td>
-                            <td class="px-6 py-4">{{ $invoice->client->name }}</td>
-                            <td class="px-6 py-4">{{ $invoice->invoice_date->format('M d, Y') }}</td>
-                            <td class="px-6 py-4 {{ $isOverdue ? 'text-red-600 dark:text-red-400' : '' }}">
+                            <td x-show="columns.client" class="px-6 py-4">{{ $invoice->client->name }}</td>
+                            <td x-show="columns.date" class="px-6 py-4">{{ $invoice->invoice_date->format('M d, Y') }}</td>
+                            <td x-show="columns.due_date"
+                                class="px-6 py-4 {{ $isOverdue ? 'text-red-600 dark:text-red-400' : '' }}">
                                 {{ $invoice->due_date->format('M d, Y') }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td x-show="columns.status" class="px-6 py-4">
                                 @if($isOverdue)
                                     <span
                                         class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
@@ -79,22 +131,61 @@
                                 @else
                                     <span
                                         class="px-2 py-1 text-xs rounded-full 
-                                                                                                                @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                                                                                                @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                                                                                                @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
+                                                                                                                                                                    @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                                                                                                                                                    @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                                                                                                                                                    @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
                                         {{ ucfirst($invoice->payment_status->value) }}
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
+                            <td x-show="columns.payment_mode" class="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
                                 {{ $invoice->payment_method ? $invoice->payment_method->label() : '-' }}
                             </td>
-                            <td class="px-6 py-4 font-semibold">₹{{ number_format($invoice->total_amount, 2) }}</td>
-                            <td class="px-6 py-4 text-emerald-600 dark:text-emerald-400 font-medium">
+                            <td x-show="columns.total" class="px-6 py-4 font-semibold">
+                                ₹{{ number_format($invoice->total_amount, 2) }}</td>
+                            <td x-show="columns.paid" class="px-6 py-4 text-emerald-600 dark:text-emerald-400 font-medium">
                                 ₹{{ number_format($invoice->total_paid, 2) }}</td>
-                            <td class="px-6 py-4 text-amber-600 dark:text-amber-400 font-medium">
+                            <td x-show="columns.balance" class="px-6 py-4 text-amber-600 dark:text-amber-400 font-medium">
                                 ₹{{ number_format($invoice->remaining_balance, 2) }}</td>
                             <td class="px-6 py-4 text-right space-x-2">
+                                <button onclick="shareInvoice_{{ $invoice->id }}()"
+                                    class="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
+                                    title="Share Invoice">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                    </svg>
+                                </button>
+                                <script>
+                                    async function shareInvoice_{{ $invoice->id }}() {
+                                        const url = '{{ route('invoices.pdf', $invoice) }}';
+                                        const filename = 'Invoice-{{ $invoice->invoice_number }}.pdf';
+
+                                        try {
+                                            const response = await fetch(url);
+                                            const blob = await response.blob();
+                                            const file = new File([blob], filename, { type: 'application/pdf' });
+
+                                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                                await navigator.share({
+                                                    files: [file],
+                                                    title: 'Invoice {{ $invoice->invoice_number }}',
+                                                    // text: 'Please find attached invoice {{ $invoice->invoice_number }}'
+                                                });
+                                            } else {
+                                                // Fallback to download
+                                                const link = document.createElement('a');
+                                                link.href = window.URL.createObjectURL(blob);
+                                                link.download = filename;
+                                                link.click();
+                                                window.URL.revokeObjectURL(link.href);
+                                            }
+                                        } catch (error) {
+                                            console.error('Error sharing invoice:', error);
+                                            alert('Failed to share invoice. Please try again.');
+                                        }
+                                    }
+                                </script>
                                 <a href="{{ route('invoices.show', $invoice) }}"
                                     class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
                                     View
@@ -118,7 +209,7 @@
                                     <button wire:click="markAsPaid({{ $invoice->id }})"
                                         wire:confirm="Are you sure you want to mark this invoice as fully paid? This will record a manual payment for the remaining balance."
                                         class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300">
-                                        Mark as Paid
+                                        Paid
                                     </button>
                                 @endif
                                 <a href="{{ route('invoices.pdf', $invoice) }}" target="_blank"

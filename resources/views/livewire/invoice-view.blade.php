@@ -14,6 +14,25 @@
                 class="px-4 py-2 border border-zinc-300 shadow-sm text-sm font-medium rounded-md text-zinc-700 bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-600 dark:hover:bg-zinc-700">
                 Download PDF
             </a>
+            <button onclick="shareInvoice_{{ $invoice->id }}()"
+                class="px-4 py-2 border border-zinc-300 shadow-sm text-sm font-medium rounded-md text-zinc-700 bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-600 dark:hover:bg-zinc-700">
+                Share Invoice
+            </button>
+            <script>
+                function shareInvoice_{{ $invoice->id }}() {
+                    const shareData = {
+                        title: 'Invoice {{ $invoice->invoice_number }}',
+                        text: 'View invoice {{ $invoice->invoice_number }}',
+                        url: '{{ URL::signedRoute('invoices.public.pdf', $invoice) }}'
+                    };
+                    if (navigator.share) {
+                        navigator.share(shareData);
+                    } else {
+                        navigator.clipboard.writeText(shareData.url);
+                        alert('Invoice link copied to clipboard!');
+                    }
+                }
+            </script>
             @if($invoice->payment_status !== \App\Enums\PaymentStatus::Paid)
                 <button wire:click="openPaymentModal"
                     class="px-4 py-2 border border-green-300 shadow-sm text-sm font-medium rounded-md text-green-700 bg-white hover:bg-green-50 dark:bg-zinc-800 dark:text-green-400 dark:border-green-900/50 dark:hover:bg-zinc-700">
@@ -52,9 +71,9 @@
                 @else
                     <span
                         class="px-3 py-1 text-sm rounded-full 
-                                                        @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                                        @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                                        @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
+                                                                    @if($invoice->payment_status === \App\Enums\PaymentStatus::Paid) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                                                    @elseif($invoice->payment_status === \App\Enums\PaymentStatus::Partial) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                                                    @else bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300 @endif">
                         {{ ucfirst($invoice->payment_status->value) }}
                     </span>
                 @endif
@@ -181,7 +200,7 @@
                 <div
                     class="inline-block align-bottom bg-white dark:bg-zinc-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        @livewire('invoice-receive-payment', ['invoice' => $invoice], key: 'payment-modal-' . $invoice->id)
+                        @livewire('invoice-receive-payment', ['invoice' => $invoice], 'payment-modal-' . $invoice->id)
                     </div>
                 </div>
             </div>

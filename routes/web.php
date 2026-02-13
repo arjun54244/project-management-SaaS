@@ -24,12 +24,13 @@ use App\Livewire\HostingList;
 use App\Livewire\HostingForm;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 })->name('home');
 
 Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('clients', ClientList::class)->name('clients.index');
@@ -53,9 +54,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('invoices/{invoice}', InvoiceView::class)->name('invoices.show');
     Route::get('invoices/{invoice}/edit', InvoiceEdit::class)->name('invoices.edit');
     Route::get('invoices/{invoice}/pdf', function (\App\Models\Invoice $invoice) {
-        $invoice->load(['client', 'subscription.package', 'items']);
-        return view('livewire.invoice-pdf', ['invoice' => $invoice]);
+        try {
+            // PART 3: MEMORY & SIZE FIX
+            @ini_set('memory_limit', '256M');
+            @ini_set('max_execution_time', 300);
+
+            // PART 1: FIX PDF CORRUPTION
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+
+            // Eager load relationships
+            $invoice->load(['client', 'subscription.package', 'items']);
+
+            // PART 5: SANITIZATION
+            $safeInvoice = \App\Services\PdfSanitizer::sanitize($invoice);
+
+            $safeInvoice->invoice_date = $invoice->invoice_date;
+            $safeInvoice->due_date = $invoice->due_date;
+
+            $safeInvoice->payment_status = $invoice->payment_status;
+
+            $safeInvoice->payment_method = $invoice->payment_method;
+
+            // Generate PDF using safe data
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('livewire.invoice-pdf', ['invoice' => $safeInvoice]);
+            return $pdf->stream('invoice-' . $invoice->invoice_number . '.pdf');
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("PDF Generation Failed: " . $e->getMessage());
+            return "Error (Safe Mode): " . $e->getMessage();
+        }
     })->name('invoices.pdf');
+
+    // PART 5: TEST MODE
+    Route::get('/test-pdf', function () {
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('test-pdf');
+        return $pdf->stream('test.pdf');
+    });
+    Route::get('invoices/public/{invoice}/pdf', [App\Http\Controllers\PublicInvoiceController::class, 'show'])
+        ->name('invoices.public.pdf')
+        ->middleware('signed');
 
     Route::get('payments', PaymentList::class)->name('payments.index');
 

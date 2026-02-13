@@ -47,7 +47,7 @@ class InvoiceService
         if (!$invoice->isFullyPaid()) {
             $paymentService->recordPayment(
                 $invoice,
-                $invoice->remaining_balance,
+                $invoice->balance,
                 \App\Enums\PaymentMethod::Cash,
                 'MANUAL-MARK-PAID',
                 'Marked as paid via admin interface'
