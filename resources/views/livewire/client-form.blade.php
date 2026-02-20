@@ -11,7 +11,7 @@
             <div>
                 <label for="name" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
                 <input wire:model="name" type="text" id="name"
-                    class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
+                    class="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-50dx0 sm:text-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
                 @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
 

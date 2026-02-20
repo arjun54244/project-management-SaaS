@@ -11,7 +11,7 @@ use Livewire\Component;
 class ClientForm extends Component
 {
     public ?Client $client = null;
-
+    public $name = '',$email = '',$phone = '',$company_name = '',$dob = '',$status = 'active';
     public $gst_number = '';
     public $gst_enabled = false;
 
