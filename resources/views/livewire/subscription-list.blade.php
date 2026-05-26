@@ -56,10 +56,11 @@
                             <td class="px-6 py-4">{{ $subscription->start_date->format('M d, Y') }}</td>
                             <td class="px-6 py-4">{{ $subscription->end_date->format('M d, Y') }}</td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 text-xs rounded-full 
-                                                @if($subscription->status === \App\Enums\SubscriptionStatus::Active) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                                @elseif($subscription->status === \App\Enums\SubscriptionStatus::Expired) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                                @else bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 @endif">
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full 
+                                                    @if($subscription->status === \App\Enums\SubscriptionStatus::Active) bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                                    @elseif($subscription->status === \App\Enums\SubscriptionStatus::Expired) bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
+                                                    @else bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 @endif">
                                     {{ ucfirst($subscription->status->value) }}
                                 </span>
                             </td>
@@ -70,8 +71,8 @@
                                     Edit
                                 </a>
                                 @if($subscription->status === \App\Enums\SubscriptionStatus::Active)
-                                    <button wire:click="openEndModal({{ $subscription->id }})"
-                                        class="ml-3 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-medium text-sm">
+                                    <button wire:click="endSubscription({{ $subscription->id }})" wire:confirm="Are you sure?"
+                                        class="ml-3 text-red-600 hover:text-red-900">
                                         End
                                     </button>
                                 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\SubscriptionStatus;
 use App\Models\Subscription;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -30,6 +31,24 @@ class SubscriptionList extends Component
     public function updatingFilterStatus()
     {
         $this->resetPage();
+    }
+
+    public function endSubscription($subscriptionId)
+    {
+        $subscription = Subscription::findOrFail($subscriptionId);
+
+        $subscription->update([
+            'status' => SubscriptionStatus::Cancelled,
+            'cancelled_at' => now(),
+            'end_date' => now(),
+        ]);
+
+        session()->flash(
+            'message',
+            'Subscription ended successfully'
+        );
+
+        $this->dispatch('subscription-ended');
     }
 
     public function render()
