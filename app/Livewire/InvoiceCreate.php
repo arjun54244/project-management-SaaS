@@ -213,7 +213,7 @@ class InvoiceCreate extends Component
                 'client_id' => $this->client_id,
                 'subscription_id' => $this->subscription_id ?: null,
                 'invoice_number' => 'INV-' . strtoupper(uniqid()),
-                  'invoice_date' => now(),
+                'invoice_date' => now(),
                 'due_date' => Carbon::parse($this->due_date),
                 'subtotal' => $this->subtotal,
                 'tax' => $this->tax,
