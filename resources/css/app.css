@@ -8,6 +8,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant midnight (&:where(.midnight, .midnight *));
+@custom-variant ocean (&:where(.ocean, .ocean *));
+@custom-variant forest (&:where(.forest, .forest *));
+@custom-variant rose-theme (&:where(.rose, .rose *));
+@custom-variant sunset (&:where(.sunset, .sunset *));
+@custom-variant lavender (&:where(.lavender, .lavender *));
+@custom-variant custom-theme (&:where(.custom, .custom *));
 
 @theme {
     --font-sans:
@@ -54,9 +60,120 @@
         --color-accent: #3b82f6;
         --color-accent-content: #60a5fa;
         --color-accent-foreground: white;
+    }
 
-        background: #667ff0;
-        color: white;
+    /* ─── Ocean: Deep navy with sky-blue accent ─── */
+    .ocean {
+        --color-zinc-50: #040d1a;
+        --color-zinc-100: #071428;
+        --color-zinc-200: #0e2040;
+        --color-zinc-300: #1a3560;
+        --color-zinc-400: #2b5080;
+        --color-zinc-500: #4477aa;
+        --color-zinc-600: #6699cc;
+        --color-zinc-700: #90bbdd;
+        --color-zinc-800: #c0d8ee;
+        --color-zinc-900: #e0eef7;
+        --color-zinc-950: #f0f7fc;
+
+        --color-accent: #38bdf8;
+        --color-accent-content: #7dd3fc;
+        --color-accent-foreground: #04090f;
+    }
+
+    /* ─── Forest: Deep green with emerald accent ─── */
+    .forest {
+        --color-zinc-50: #020f05;
+        --color-zinc-100: #061a09;
+        --color-zinc-200: #0c2812;
+        --color-zinc-300: #14391c;
+        --color-zinc-400: #1e5228;
+        --color-zinc-500: #2e7440;
+        --color-zinc-600: #489060;
+        --color-zinc-700: #72b585;
+        --color-zinc-800: #a8d4b4;
+        --color-zinc-900: #d4edda;
+        --color-zinc-950: #eaf6ee;
+
+        --color-accent: #34d399;
+        --color-accent-content: #6ee7b7;
+        --color-accent-foreground: #020f05;
+    }
+
+    /* ─── Rose: Deep crimson with rose accent ─── */
+    .rose {
+        --color-zinc-50: #150508;
+        --color-zinc-100: #220810;
+        --color-zinc-200: #36101c;
+        --color-zinc-300: #501828;
+        --color-zinc-400: #742038;
+        --color-zinc-500: #9e2e50;
+        --color-zinc-600: #c04a70;
+        --color-zinc-700: #d87090;
+        --color-zinc-800: #eba0b8;
+        --color-zinc-900: #f5ccda;
+        --color-zinc-950: #fbe8ee;
+
+        --color-accent: #fb7185;
+        --color-accent-content: #fda4af;
+        --color-accent-foreground: #150508;
+    }
+
+    /* ─── Sunset: Warm amber with orange accent ─── */
+    .sunset {
+        --color-zinc-50: #150700;
+        --color-zinc-100: #240d00;
+        --color-zinc-200: #3a1500;
+        --color-zinc-300: #552000;
+        --color-zinc-400: #7c3000;
+        --color-zinc-500: #a84800;
+        --color-zinc-600: #cc6800;
+        --color-zinc-700: #e08830;
+        --color-zinc-800: #f0b070;
+        --color-zinc-900: #f8d4a8;
+        --color-zinc-950: #fdebd4;
+
+        --color-accent: #fb923c;
+        --color-accent-content: #fdba74;
+        --color-accent-foreground: #150700;
+    }
+
+    /* ─── Lavender: Deep purple with violet accent ─── */
+    .lavender {
+        --color-zinc-50: #0a0612;
+        --color-zinc-100: #120c1e;
+        --color-zinc-200: #1e1430;
+        --color-zinc-300: #2e2048;
+        --color-zinc-400: #453068;
+        --color-zinc-500: #614890;
+        --color-zinc-600: #8264b8;
+        --color-zinc-700: #a888d4;
+        --color-zinc-800: #ccb4e8;
+        --color-zinc-900: #e4d8f5;
+        --color-zinc-950: #f3eefb;
+
+        --color-accent: #c084fc;
+        --color-accent-content: #d8b4fe;
+        --color-accent-foreground: #0a0612;
+    }
+
+    /* ─── Custom: Dark neutral base with user-defined accent ─── */
+    .custom {
+        --color-zinc-50: #0a0a10;
+        --color-zinc-100: #101018;
+        --color-zinc-200: #1c1c28;
+        --color-zinc-300: #2c2c40;
+        --color-zinc-400: #484868;
+        --color-zinc-500: #686890;
+        --color-zinc-600: #9090b0;
+        --color-zinc-700: #b8b8cc;
+        --color-zinc-800: #d8d8e4;
+        --color-zinc-900: #ededf4;
+        --color-zinc-950: #f6f6fa;
+
+        --color-accent: var(--custom-accent, #818cf8);
+        --color-accent-content: var(--custom-accent-light, #a5b4fc);
+        --color-accent-foreground: #ffffff;
     }
 }
 
