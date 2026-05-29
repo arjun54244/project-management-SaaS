@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: May 26, 2026 at 06:06 AM
--- Server version: 11.8.6-MariaDB-log
--- PHP Version: 7.2.34
+-- Host: 127.0.0.1
+-- Generation Time: May 29, 2026 at 10:43 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u784288082_prm`
+-- Database: `prm`
 --
 
 -- --------------------------------------------------------
@@ -56,8 +56,8 @@ INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
 ('digitech-healthcare-cache-a997feccf75815eeb186871db9f05484:timer', 'i:1779269558;', 1779269558),
 ('digitech-healthcare-cache-c2be61ea3c8af284f517107b1608c870', 'i:1;', 1773644771),
 ('digitech-healthcare-cache-c2be61ea3c8af284f517107b1608c870:timer', 'i:1773644771;', 1773644771),
-('digitech-healthcare-cache-c525a5357e97fef8d3db25841c86da1a', 'i:1;', 1776420303),
-('digitech-healthcare-cache-c525a5357e97fef8d3db25841c86da1a:timer', 'i:1776420303;', 1776420303),
+('digitech-healthcare-cache-c525a5357e97fef8d3db25841c86da1a', 'i:1;', 1780034223),
+('digitech-healthcare-cache-c525a5357e97fef8d3db25841c86da1a:timer', 'i:1780034223;', 1780034223),
 ('digitech-healthcare-cache-c8eeedf7a2ea26bb7f04c0daa3f706b4', 'i:1;', 1779441223),
 ('digitech-healthcare-cache-c8eeedf7a2ea26bb7f04c0daa3f706b4:timer', 'i:1779441223;', 1779441223),
 ('digitech-healthcare-cache-cceae3f5e5815bfe3d68889bc3703b08', 'i:1;', 1772272604),
@@ -550,18 +550,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('2lnk9nEI8qrD1f5oIF82jfls6PiuDop3dq7ji4Z6', NULL, '34.58.152.180', 'Mozilla/5.0 (compatible; CMS-Checker/1.0; +https://example.com)', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiSWROWjdBVUcySVplMTNtMFREMTROY2tPbVRRR01hNlRVWTJJN1A0ViI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czo0NDoiaHR0cHM6Ly9jcm0uZGlnaXRlY2hoZWFsdGhjYXJlLmNvbS9kYXNoYm9hcmQiO31zOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czo0NDoiaHR0cHM6Ly9jcm0uZGlnaXRlY2hoZWFsdGhjYXJlLmNvbS9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1779717011),
-('3iyxIf38hSaDabcu67rGwPUWEV4hyLm06GM1A9rQ', NULL, '2a02:4780:11:c0de::e', 'Go-http-client/2.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicVBBNFlaY0NLdlBCbUxsMGxFUEVrM2M3dVpjUGd2Rlg4SDJXczVHWiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20vbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1779710386),
-('3PDdxZOQQ8yGHWrET0cu4EzC9wYBsD2nq2wDyWYB', 1, '2401:4900:1c5a:9e77:2472:c9de:a5ff:6a20', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoicGJzRW5XeUlPQllCVENHcnAxa3VCTWhmdVVybTdwTjUwS1RDME9EaiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDg6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20vc3Vic2NyaXB0aW9ucyI7czo1OiJyb3V0ZSI7czoxOToic3Vic2NyaXB0aW9ucy5pbmRleCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6MzoidXJsIjthOjA6e31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1779705033),
-('b9SFQrcK0bXg5iIeeQseeUPwM2g0mS4p1fIYRhMg', NULL, '2a02:4780:11:c0de::e', 'Go-http-client/2.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiV0xoQTBCa1dPTm5aMnI4ZnlFMmZzOUNzREdVQmZJVGlScGpaRE9sMSI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czo0NDoiaHR0cHM6Ly9jcm0uZGlnaXRlY2hoZWFsdGhjYXJlLmNvbS9kYXNoYm9hcmQiO31zOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czo0NDoiaHR0cHM6Ly9jcm0uZGlnaXRlY2hoZWFsdGhjYXJlLmNvbS9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1779710386),
-('BMlQzkCgfzjXr7ioEA4Sv9Nenxk8ixMe6mOONNpM', NULL, '2600:1f16:743:ac00:1752:36dc:400f:b80f', 'visionheight.com/scan Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/126.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoidDRCQUJuWVpKNXVkRkljcXRSaUN2N1JQNWV4VHo5SzF4R3hHU3ZDOSI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czo0NDoiaHR0cHM6Ly9jcm0uZGlnaXRlY2hoZWFsdGhjYXJlLmNvbS9kYXNoYm9hcmQiO31zOjk6Il9wcmV2aW91cyI7YToyOntzOjM6InVybCI7czo0NDoiaHR0cHM6Ly9jcm0uZGlnaXRlY2hoZWFsdGhjYXJlLmNvbS9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1779751438),
-('HVDKwdIhqRsEtjGk06GpIzZjVUsvNhiZP4AaJRbk', NULL, '2600:1f16:743:ac00:1752:36dc:400f:b80f', 'visionheight.com/scan Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/126.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWWhmaFpWWGdMeHFHS2JkMUllcGxsSWFlSk9idzE1M2pIRGpwdG5YbyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20vbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1779751439),
-('iAPefZzTXjQKzp7Kv0wnNg0orVPrinGjP2hP2E4H', NULL, '2a02:4780:11:c0de::e', 'Go-http-client/2.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibFN2RVlnY2F6Z2hVaGZFTTI0MkVVVlFpMUNTcVZETWQyanltbG1OdSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20iO3M6NToicm91dGUiO3M6NDoiaG9tZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1779710386),
-('lHcGpUcENIW6F5Cnjqu1jqhuYtS0hEi8CrHFoswq', NULL, '34.58.152.180', 'Mozilla/5.0 (compatible; CMS-Checker/1.0; +https://example.com)', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoid2syU0UxbFNJWFZuMHJIQ05tdVZQYnVxMGxZMnZraXV4ajltZlhmbSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20vbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1779717012),
-('R1sKKtISGUEjMyZuzzrTeLtxSVRGjApN1sr62gWp', NULL, '34.58.152.180', 'Mozilla/5.0 (compatible; CMS-Checker/1.0; +https://example.com)', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoia3VMNGJURWNnTUZoV0h3ZjZ4QlFyY295NDNyQUVnODNLdjhLMWVmeCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20iO3M6NToicm91dGUiO3M6NDoiaG9tZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1779717011),
-('sw8lWevRYumS5smbdVonI5M7HvoAxctxQkaDxn2p', NULL, '2600:1f16:743:ac00:1752:36dc:400f:b80f', 'visionheight.com/scan Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/126.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWEdRTzlPOFVkQmR5cjA4QjZVUmRMWU9EajU0eURSR3c1MXJ5N2x5ZyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20iO3M6NToicm91dGUiO3M6NDoiaG9tZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1779751438),
-('UyrPH75N02aeuOHBNa3SY5x2khZW2OwfxODmMg1m', NULL, '2401:4900:1c5a:9e77:5cc9:a074:2d63:d25e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiUWkwNDVKaUNFMFFiNnM0RXR5SmZMVGJTZzlWNUVaWXoxUmZQd2xubCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20vbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjM6InVybCI7YToxOntzOjg6ImludGVuZGVkIjtzOjQ0OiJodHRwczovL2NybS5kaWdpdGVjaGhlYWx0aGNhcmUuY29tL2Rhc2hib2FyZCI7fX0=', 1779775374),
-('vTGjhA9cn1dQm3uJ4kga9BQMJnjIs4QJ6fs4t4xI', 1, '2401:4900:1c5a:9e77:5cc9:a074:2d63:d25e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiS1BXSGltNXRCSFlTZHFsdUVsVEpzWUZkYjlrU0t3UXVwMzdJU2R2QyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDk6Imh0dHBzOi8vY3JtLmRpZ2l0ZWNoaGVhbHRoY2FyZS5jb20vaW52b2ljZXMvNi9wZGYiO3M6NToicm91dGUiO3M6MTI6Imludm9pY2VzLnBkZiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6MzoidXJsIjthOjA6e31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1779712164);
+('fLOyqUuiHaXOMQQf8C5lMIUZJVYqj7LP03ASK9fi', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiRWdVbDcwSXlWZ1JnN3pmVUtMaW1xVnRuRTRLU2g1OWJ3Qmxrcmg3dCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9pbnZvaWNlcy82L3BkZiI7czo1OiJyb3V0ZSI7czoxMjoiaW52b2ljZXMucGRmIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czozOiJ1cmwiO2E6MDp7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1780038727);
 
 -- --------------------------------------------------------
 
@@ -593,7 +582,7 @@ CREATE TABLE `subscriptions` (
 
 INSERT INTO `subscriptions` (`id`, `client_id`, `package_id`, `start_date`, `end_date`, `price_before_discount`, `discount_type`, `discount_value`, `final_price`, `status`, `cancelled_at`, `cancellation_reason`, `created_at`, `updated_at`, `parent_subscription_id`) VALUES
 (3, 4, 5, '2026-05-21', '2026-08-21', 63999.99, NULL, 0.00, 63999.99, 'active', NULL, NULL, '2026-05-21 07:40:09', '2026-05-21 07:40:09', NULL),
-(4, 4, 7, '2026-05-25', '2026-08-25', 60000.00, 'flat', 5000.00, 55000.00, 'active', NULL, NULL, '2026-05-25 09:43:56', '2026-05-25 09:43:56', NULL);
+(4, 4, 7, '2026-05-25', '2026-05-26', 60000.00, 'flat', 5000.00, 55000.00, 'cancelled', '2026-05-26 01:59:26', NULL, '2026-05-25 09:43:56', '2026-05-26 01:59:26', NULL);
 
 -- --------------------------------------------------------
 
