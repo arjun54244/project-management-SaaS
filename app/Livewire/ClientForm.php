@@ -24,7 +24,7 @@ class ClientForm extends Component
             $this->phone = $client->phone;
             $this->company_name = $client->company_name;
             $this->gst_number = $client->gst_number;
-            $this->gst_enabled = $client->gst_enabled;
+            $this->gst_enabled = (bool) $client->gst_enabled;
             $this->dob = $client->dob ? $client->dob->format('Y-m-d') : '';
             $this->status = $client->status;
         }

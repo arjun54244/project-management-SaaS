@@ -10,8 +10,8 @@
         status: true,
         payment_mode: true,
         total: true,
-        paid: true,
-        balance: true
+        // paid: true,
+        // balance: true
     },
 
     toggleColumn(col) {
@@ -210,8 +210,8 @@
                         <th x-show="columns.status" class="px-6 py-3">Status</th>
                         <th x-show="columns.payment_mode" class="px-6 py-3">Payment Mode</th>
                         <th x-show="columns.total" class="px-6 py-3">Total</th>
-                        <th x-show="columns.paid" class="px-6 py-3">Paid</th>
-                        <th x-show="columns.balance" class="px-6 py-3">Balance</th>
+                        <!-- <th x-show="columns.paid" class="px-6 py-3">Paid</th>
+                        <th x-show="columns.balance" class="px-6 py-3">Balance</th> -->
                         <th class="px-6 py-3 text-right">Actions</th>
                     </tr>
 
@@ -290,16 +290,16 @@
                             </td>
 
                             <!-- Paid -->
-                            <td x-show="columns.paid"
+                            <!-- <td x-show="columns.paid"
                                 class="px-6 py-4 text-emerald-600 dark:text-emerald-400 font-medium">
                                 ₹{{ number_format($invoice->total_paid, 2) }}
-                            </td>
+                            </td> -->
 
                             <!-- Balance -->
-                            <td x-show="columns.balance"
+                            <!-- <td x-show="columns.balance"
                                 class="px-6 py-4 text-amber-600 dark:text-amber-400 font-medium">
                                 ₹{{ number_format($invoice->remaining_balance, 2) }}
-                            </td>
+                            </td> -->
 
                             <!-- Actions -->
                             <td class="px-6 py-4 text-right whitespace-nowrap space-x-3">

@@ -168,7 +168,7 @@
                                     {{ $invoice->due_date->format('M d, Y') }}
                                 </td>
                                 <td class="px-6 py-4 text-right font-semibold text-amber-600">
-                                    ₹{{ number_format($invoice->remaining_balance, 2) }}
+                                    ₹{{ number_format($invoice->total_amount, 2) }}
                                 </td>
                                 <td class="px-6 py-4 text-center space-x-3">
                                     <a href="{{ route('invoices.edit', $invoice) }}"

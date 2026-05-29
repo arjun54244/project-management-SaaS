@@ -53,61 +53,75 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('invoices/create', InvoiceCreate::class)->name('invoices.create');
     Route::get('invoices/{invoice}', InvoiceView::class)->name('invoices.show');
     Route::get('invoices/{invoice}/edit', InvoiceEdit::class)->name('invoices.edit');
-Route::get('invoices/{invoice}/pdf', function (\App\Models\Invoice $invoice) {
+    Route::get('invoices/{invoice}/pdf', function (\App\Models\Invoice $invoice) {
 
-    try {
+        try {
 
-        @ini_set('memory_limit', '512M');
-        @ini_set('max_execution_time', 300);
+            @ini_set('memory_limit', '512M');
+            @ini_set('max_execution_time', 300);
 
-        while (ob_get_level()) {
-            ob_end_clean();
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+
+            $invoice->load([
+                'client',
+                'subscription.package',
+                'items'
+            ]);
+
+            $safeInvoice = \App\Services\PdfSanitizer::sanitize($invoice);
+
+            // Manual hydration for specific fields used in View
+            $safeInvoice->invoice_date = $invoice->invoice_date;
+            $safeInvoice->due_date = $invoice->due_date;
+            $safeInvoice->payment_status = $invoice->payment_status;
+            $safeInvoice->payment_method = $invoice->payment_method;
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+                'livewire.invoice-pdf',
+                [
+                    'invoice' => $safeInvoice
+                ]
+            )
+                ->setPaper('a4', 'portrait')
+                ->setWarnings(false)
+                ->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isPhpEnabled' => false,
+                    'isRemoteEnabled' => true,
+                    'defaultFont' => 'DejaVu Sans',
+                    'dpi' => 98,
+                    'compress' => false,
+                    'defaultMediaType' => 'screen',
+
+                    'isFontSubsettingEnabled' => true,
+
+                    'chroot' => public_path(),
+                    'enable_css_float' => false,
+                ]);
+            // return view('livewire.invoice-pdf', ['invoice' => $safeInvoice]);
+
+            return response()->streamDownload(
+                function () use ($pdf) {
+                    echo $pdf->output();
+                },
+                'invoice-' . $invoice->invoice_number . '.pdf',
+                [
+                    'Content-Type' => 'application/pdf',
+                ]
+            );
+
+        } catch (\Throwable $e) {
+
+            \Log::error('PDF Error: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
         }
 
-        $invoice->load([
-            'client',
-            'subscription.package',
-            'items'
-        ]);
-
-        $safeInvoice = \App\Services\PdfSanitizer::sanitize($invoice);
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
-            'livewire.invoice-pdf',
-            [
-                'invoice' => $safeInvoice
-            ]
-        )
-        ->setPaper('a4', 'portrait')
-        ->setWarnings(false)
-        ->setOptions([
-            'isHtml5ParserEnabled' => true,
-            'isPhpEnabled' => false,
-            'isRemoteEnabled' => true,
-            'defaultFont' => 'DejaVu Sans',
-            'dpi' => 96,
-        ]);
-
-        return response()->streamDownload(
-            function () use ($pdf) {
-                echo $pdf->output();
-            },
-            'invoice-' . $invoice->invoice_number . '.pdf',
-            [
-                'Content-Type' => 'application/pdf',
-            ]
-        );
-
-    } catch (\Throwable $e) {
-
-        \Log::error('PDF Error: ' . $e->getMessage());
-
-        return response()->json([
-            'error' => $e->getMessage()
-        ], 500);
-    }
-
-})->name('invoices.pdf');
+    })->name('invoices.pdf');
 
     // PART 5: TEST MODE
     Route::get('/test-pdf', function () {

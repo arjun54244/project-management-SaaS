@@ -57,9 +57,19 @@ class Invoice extends Model
         return $this->payments()->sum('amount');
     }
 
+    public function getTotalPaidAttribute()
+    {
+        return (float) $this->getPaidAmountAttribute();
+    }
+
     public function getBalanceAttribute()
     {
         return max(0, $this->total_amount - $this->paid_amount);
+    }
+
+    public function getRemainingBalanceAttribute()
+    {
+        return (float) $this->getBalanceAttribute();
     }
 
     public function recalculateStatus()

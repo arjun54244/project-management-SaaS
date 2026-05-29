@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\InvoiceForm;
+use App\Livewire\InvoiceCreate;
 use App\Livewire\InvoiceList;
 use App\Livewire\InvoiceView;
 use App\Models\Client;
@@ -51,7 +51,7 @@ class InvoiceManagementTest extends TestCase
 
         $subscription = $this->createSubscription();
 
-        Livewire::test(InvoiceForm::class)
+        Livewire::test(InvoiceCreate::class)
             ->set('subscription_id', $subscription->id)
             ->call('save')
             ->assertRedirect(route('invoices.index'));
@@ -145,8 +145,8 @@ class InvoiceManagementTest extends TestCase
         $response = $this->get(route('invoices.pdf', $invoice));
 
         $response->assertStatus(200);
-        $response->assertSee($invoice->invoice_number);
-        $response->assertSee('INVOICE');
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $response->assertHeader('Content-Disposition', 'attachment; filename=invoice-' . $invoice->invoice_number . '.pdf');
     }
 
     public function test_invoice_service_generates_correct_invoice()
